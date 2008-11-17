@@ -138,13 +138,13 @@ class CachedPassPersist(PassPersist):
 
     subtree = property(PassPersist._get_subtree, _set_subtree)
 
-    def _handle_getnext(self):
+    def _handle_getnext(self, request):
         self._check_and_update_cache()
-        super(CachedPassPersist, self)._handle_getnext()
+        super(CachedPassPersist, self)._handle_getnext(request)
 
-    def _handle_get(self):
+    def _handle_get(self, request):
         self._check_and_update_cache()
-        super(CachedPassPersist, self)._handle_get()
+        super(CachedPassPersist, self)._handle_get(request)
 
 class DictSubtree(object):
     """A dictionary-based subtree base class.
