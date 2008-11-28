@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import sys
 import re
+from bisect import bisect_right
 from time import time
 
 class FlushFile(object):
+    """Write-only flushing wrapper for file-type objects."""
     def __init__(self, f):
         self.f = f
     def write(self, x):
@@ -62,32 +64,52 @@ class PassPersist(object):
 
     subtree = property(_get_subtree, _set_subtree)
 
-    def _handle_get(self, request):
+    def get(self, request):
+        """An SNMP get request.
+
+        The request should be a string in the format ".root_oid.sub_oid"
+
+        Returns a tuple: (oid, result_type, result) if a value exists at the
+        requested OID, otherwise None.
+        """
         request_match = self._oid_re.match(request)
-        
+
         if request_match:
-            value = self._subtree.get(request_match.group(2))
-
-        if value is None:
-            print "NONE"
+            result = self._subtree.get(request_match.group(2))
+            if result:
+                return request, result[0], result[1]
+            else:
+                return None
         else:
-            print request
-            print value[0]
-            print value[1]
+            return None
 
-    def _handle_getnext(self, request):
+    def getnext(self, request):
+        """An SNMP getnext request.
+
+        Returns a tuple: (oid, result_type, result) from the next OID in the tree.
+        Returns None only if there are no other OIDs in the current tree.
+        """
         request_match = self._oid_re.match(request)
 
         if request_match:
             try:
-                idx = self._oids.index(request_match.group(2))
-                oid = self._oids[idx+1]
-                value = self._subtree[oid]
-                print "%s%s" % (self._base_oid, oid)
-                print value[0]
-                print value[1]
+                idx = bisect_right(self._oids, request_match.group(2))
+                oid = self._oids[idx]
+                result = self._subtree[oid]
+                return "%s%s" % (self._base_oid, oid), result[0], result[1]
             except (ValueError, IndexError):
-                print "NONE"
+                return None
+        else:
+            return None
+
+    def _handle_request(self, request, request_func):
+        result = request_func(request)
+        if result:
+            print result[0]
+            print result[1]
+            print result[2]
+        else:
+            print "NONE"
 
     def listen(self):
         """Begins listening for SNMP requests."""
@@ -96,10 +118,10 @@ class PassPersist(object):
                 line = raw_input()
                 if line == "get":
                     request = raw_input()
-                    self._handle_get(request)
+                    self._handle_request(request, self.get)
                 elif line == "getnext":
                     request = raw_input()
-                    self._handle_getnext(request)
+                    self._handle_request(request, self.getnext)
                 elif line == "PING":
                     print "PONG"
                 else:
@@ -138,13 +160,13 @@ class CachedPassPersist(PassPersist):
 
     subtree = property(PassPersist._get_subtree, _set_subtree)
 
-    def _handle_getnext(self, request):
+    def get(self, request):
         self._check_and_update_cache()
-        super(CachedPassPersist, self)._handle_getnext(request)
+        return super(CachedPassPersist, self).get(request)
 
-    def _handle_get(self, request):
+    def getnext(self, request):
         self._check_and_update_cache()
-        super(CachedPassPersist, self)._handle_get(request)
+        return super(CachedPassPersist, self).getnext(request)
 
 class DictSubtree(object):
     """A dictionary-based subtree base class.
@@ -171,6 +193,6 @@ class DictSubtree(object):
         return self.oid_dict.keys()
 
 if __name__ == "__main__":
-    subtree = { '.0' : ('STRING', 'Foo'), '.1' : ('STRING', 'Bar') }
+    subtree = { '.1.1' : ('STRING', 'Foo'), '.1.2' : ('STRING', 'Bar') }
     persist = CachedPassPersist(".0.0", subtree)
     persist.listen()
