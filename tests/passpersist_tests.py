@@ -1,5 +1,13 @@
 import passpersist
 
+class oid_bisect_right_Tests(object):
+    def oid_bisect_right_test(self):
+        oid_sorted_list = [".0.0", ".0.2", ".0.3", ".0.4", ".0.20", ".0.26", ".0.31"]
+        oid3 = ".0.3"
+        oid21 = ".0.21"
+        assert passpersist.oid_bisect_right(oid_sorted_list, oid3) == 3
+        assert passpersist.oid_bisect_right(oid_sorted_list, oid21) == 5
+
 class oid_compare_Tests(object):
     def oid_compare_test_smaller(self):
         oid1 = ".0.0"

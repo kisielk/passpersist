@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 import re
-from bisect import bisect_right
 from time import time
 
 class FlushFile(object):
@@ -20,6 +19,18 @@ def oid_compare(x, y):
     a = [int(v) for v in x.split('.')[1:]]
     b = [int(v) for v in y.split('.')[1:]]
     return cmp(a, b)
+
+def oid_bisect_right(a, x):
+    """bisect_right for an array of OID strings"""
+    lo = 0
+    hi = len(a)
+    while lo < hi:
+        mid = (lo + hi)//2
+        if oid_compare(x, a[mid]) == -1:
+            hi = mid
+        else:
+            lo = mid + 1
+    return lo
 
 class PassPersist(object):
     """Implements a Net-SNMP pass-persist module for a given subtree.
@@ -93,7 +104,7 @@ class PassPersist(object):
 
         if request_match:
             try:
-                idx = bisect_right(self._oids, request_match.group(2))
+                idx = oid_bisect_right(self._oids, request_match.group(2))
                 oid = self._oids[idx]
                 result = self._subtree[oid]
                 return "%s%s" % (self._base_oid, oid), result[0], result[1]
