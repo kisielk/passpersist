@@ -16,6 +16,17 @@ class oid_compare_Tests(object):
         oid2 = ".0.1.1"
         assert passpersist.oid_compare(oid1, oid2) == 1
 
+    def oid_compare_test_notlexical(self):
+        oid1 = ".0.1.3"
+        oid2 = ".0.1.20"
+        assert passpersist.oid_compare(oid1, oid2) == -1
+
+    def oid_compare_test_list_sort(self):
+        oid_list = [".0.0", ".0.3", ".0.20", ".0.2", ".0.26", ".0.31", ".0.4"]
+        oid_sorted_list = [".0.0", ".0.2", ".0.3", ".0.4", ".0.20", ".0.26", ".0.31"]
+        oid_list.sort(passpersist.oid_compare)
+        assert oid_list == oid_sorted_list
+
 class PassPersist_Tests(object):
     def setUp(self):
         self.root = '.0.0'
