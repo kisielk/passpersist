@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='PassPersist',
-        version='0.2',
+        version='0.3',
         description='Net-SNMP pass_persist plugin base classes',
         author='Kamil Kisiel',
         author_email='kamil@kamilkisiel.net',
