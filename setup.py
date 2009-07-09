@@ -2,8 +2,8 @@
 
 from distutils.core import setup
 
-setup(name='PassPersist',
-        version='0.3',
+setup(name='python-passpersist',
+        version='0.4',
         description='Net-SNMP pass_persist plugin base classes',
         author='Kamil Kisiel',
         author_email='kamil@kamilkisiel.net',
