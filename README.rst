@@ -1,4 +1,4 @@
-PassPersist: A library for writing Net-SNMP pass_persist commands
+passpersist: A library for writing Net-SNMP pass_persist commands
 =================================================================
 
 Installation
