@@ -2,7 +2,7 @@ Name: python-passpersist
 Version: 0.4.1
 Release: 1
 Summary: Net-SNMP pass_persist Python Module
-License: Zymeworks
+License: BSD
 Group: Development/Libraries/Python
 Source:	python-passpersist-%{version}.tar.bz2
 # BuildRoot: %{_tmppath}/%{name}-%{version}-build
