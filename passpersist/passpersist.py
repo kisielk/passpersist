@@ -1,6 +1,6 @@
-import sys
 import re
 from time import time
+
 
 def oid_compare(x, y):
     """Comparison function for OID strings."""
@@ -8,17 +8,19 @@ def oid_compare(x, y):
     b = [int(v) for v in y.split('.')[1:]]
     return cmp(a, b)
 
+
 def oid_bisect_right(a, x):
     """bisect_right for an array of OID strings"""
     lo = 0
     hi = len(a)
     while lo < hi:
-        mid = (lo + hi)//2
+        mid = (lo + hi) // 2
         if oid_compare(x, a[mid]) == -1:
             hi = mid
         else:
             lo = mid + 1
     return lo
+
 
 class PassPersist(object):
     """Implements a Net-SNMP pass-persist module for a given subtree.
@@ -129,9 +131,10 @@ class PassPersist(object):
             # It's ok to get EOF, it just breaks us out of the loop
             pass
 
+
 class CachedPassPersist(PassPersist):
     """A cached version of PassPersist.
-    
+
     Functions much like the PassPersist class except that it keeps a cache of
     the dictionary values for the number of seconds specified by the cache
     parameter. This is suitable for plugins where the data is expensive to
@@ -167,6 +170,7 @@ class CachedPassPersist(PassPersist):
         self._check_and_update_cache()
         return super(CachedPassPersist, self).getnext(request)
 
+
 class DictSubtree(object):
     """A dictionary-based subtree base class.
 
@@ -191,7 +195,8 @@ class DictSubtree(object):
         self.update_dict()
         return self.oid_dict.keys()
 
+
 if __name__ == "__main__":
-    subtree = { '.1.1' : ('STRING', 'Foo'), '.1.2' : ('STRING', 'Bar') }
+    subtree = {'.1.1': ('STRING', 'Foo'), '.1.2': ('STRING', 'Bar')}
     persist = CachedPassPersist(".0.0", subtree)
     persist.listen()
