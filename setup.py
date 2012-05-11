@@ -7,6 +7,5 @@ setup(name='python-passpersist',
         description='Net-SNMP pass_persist plugin base classes',
         author='Kamil Kisiel',
         author_email='kamil@kamilkisiel.net',
-        url='http://trac.lan.zymeworks.com/',
         packages=['passpersist'],
         )
